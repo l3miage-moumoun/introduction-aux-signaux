@@ -211,8 +211,8 @@ export class AppComponent {
 //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
 
 //Git
- // git config --global user.name "Votre Nom"
- // git config --global user.email "votre.email@example.com"
+ // git config --global user.name "l3miagemoumoun"
+ // git config --global user.email "nassima.moumou@etu.univ-grenoble-alpes.f"
  //git push
 //git commit -m "Ajout du travail"
 //git push
