@@ -38,8 +38,37 @@ export class AppComponent {
     function rand100(): string { // fonction utilitaire locale
       return Math.floor(Math.random() * 100).toString();
     }
+
     // à compléter
-  }
+    const a = signal<number>(0);
+    /*
+      utilisez bien la méthode process de DataService
+      pour ajouter les actions à exécuter dans la file d'attente
+    */
+    for (let i = 1; i <= 3; i++) {
+      this.ds.process( () => a.set(i));
+     }
+
+     // a.set(100);
+      
+      //type tab = any;
+      const b = computed<readonly string[]> ( () => {
+        const res: string[] = [];
+        for( let i = 0; i < a(); i++ ) {
+          res.push(rand100());
+        }
+        return res;
+
+      });
+      
+      const e = effect ( () => console.log("Qestion 1: ",a(), b()));
+      //exécution de l'effet 
+      e();
+    }
+  //DataService
+  //ds: any;
+         
+  
 
   
   /**
@@ -75,6 +104,37 @@ export class AppComponent {
     ];
 
     // à compléter
+    const students = signal <readonly Student[]>(L);
+     //computed c'est pour cree un signla calcule qui depend du signal students 
+ const studentsWithAverage = computed<readonly StudentWithAverage[]>(() => {
+  return students()
+    .map((student: Student) => ({ //obtenir la valeur actuelle du tab students 
+      ...student, //utilisé pour copier toutes les propriétés de l'objet student 
+      average: student.marks.reduce((acc, mark) => acc + mark, 0) / student.marks.length, //il calcule la moy avec reduce sur les marks il additionne toutes les notes puis on devise par le nombre total de notes 
+      pass: student.marks.reduce((acc, mark) => acc + mark, 0) / student.marks.length >= 10 //on calcule la moyenne apres on determine si est >=10
+    }))
+    .filter((student: StudentWithAverage) => student.pass) //on filtre que les etudiant qui ont reussi
+    .sort((a: StudentWithAverage, b: StudentWithAverage) => b.average - a.average); //trie les notes des etudiant decroissant 
+});
+  
+  const bestStudent = signal <StudentWithAverage> ( () => studentsWithAverage()[0]); //la meilleure note c'est du premier element du tab studentsWithAverage
+    
+  //Définir un effet
+  const e = effect ( () => {
+    console.log("Qestion 2: ");
+    console.log("Students: ", students());
+    console.log("StudentWithAverage: ", studentsWithAverage());
+    console.log("bestStudent: ", bestStudent());
+  });
+
+   // Faire varier la valeur de students en ajoutant un élève à la fin du tableau, utilisez bien la méthode process de DataService
+   DataService.process(() => {
+    const newStudent: Student = { name: "Hank", marks: [15, 17, 18] };
+    students([...students(), newStudent]);
+  });
+
+
+ 
   }
 
 
@@ -107,6 +167,20 @@ export class AppComponent {
       { name: "Marseille", temperature: signal({value: 300, unit: '°K'}) },
     ];
 
+    const sum: number = L.reduce((accumulator, currentValue) => accumulator + currentValue.temperature.value, 0);
+    const moy: number= sum / L.length;
+
+    for(let i=0; i<L.length; i++){
+      effect(() => console.log(moy, L[i]));
+    }
+
+    L.push({name: "Le havre" , temperature: signal ( {value: 60, unit: '°C'}) });//ajouter une station 
+    L.splice(1.1); //supprimer le 2eme station 
+    mutate.L({})
+
+
+   
+   
   }
 
 
@@ -132,3 +206,6 @@ export class AppComponent {
   }
   
 }
+
+
+//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
